@@ -1,9 +1,10 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/create-post.js", "use": "@vercel/node" }
+    { "src": "api/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "^/api/create-post$", "dest": "api/create-post.js", "methods": ["GET", "POST"] }
+    { "src": "^/api/hello$", "dest": "api/hello.js", "methods": ["GET"] },
+    { "src": "^/api/create-post$", "dest": "api/create-post.js", "methods": ["GET","POST"] }
   ]
 }
