@@ -1,15 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "api/create-post.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "builds": [
+    { "src": "api/create-post.js", "use": "@vercel/node" }
+  ],
   "routes": [
-    {
-      "src": "^/api/create-post$",
-      "dest": "/api/create-post.js",
-      "methods": ["GET", "POST"]
-    }
+    { "src": "^/api/create-post$", "dest": "api/create-post.js", "methods": ["GET", "POST"] }
   ]
 }
