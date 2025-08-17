@@ -9,44 +9,27 @@ module.exports = async (req, res) => {
   }
 
   const authHeader = req.headers['authorization'];
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Missing Authorization header' });
-  }
+  if (!authHeader) return res.status(401).json({ error: 'Missing Authorization header' });
 
-  // Body may arrive as a string; normalize it
   let body = req.body;
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch { return res.status(400).json({ error: 'Invalid JSON body' }); }
   }
-
   const { title, content, status = 'publish' } = body || {};
-  if (!title || !content) {
-    return res.status(400).json({ error: 'Missing title or content' });
-  }
+  if (!title || !content) return res.status(400).json({ error: 'Missing title or content' });
 
   try {
     const wpRes = await fetch('https://evergreenanalyticspartners.com/wp-json/wp/v2/posts', {
       method: 'POST',
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': authHeader, 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, content, status })
     });
 
     const text = await wpRes.text();
-    let json;
-    try { json = JSON.parse(text); } catch { json = { raw: text }; }
+    let json; try { json = JSON.parse(text); } catch { json = { raw: text }; }
+    if (!wpRes.ok) return res.status(wpRes.status).json({ error: json });
 
-    if (!wpRes.ok) {
-      return res.status(wpRes.status).json({ error: json });
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      message: 'Post published',
-      link: json && json.link ? json.link : null
-    });
+    return res.status(200).json({ status: 'success', message: 'Post published', link: json?.link || null });
   } catch (err) {
     return res.status(500).json({ error: 'Proxy failed', details: err.message });
   }
